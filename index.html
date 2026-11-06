@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WaltLearn — learn anything, properly</title>
+<meta name="description" content="Pick a topic, set your time and level, and get taught step by step — with notes, videos and a test.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&family=Cinzel:wght@700;800;900&family=Righteous&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=57">
+</head>
+<body>
+<div class="preloader" id="preloader"><span class="preloader-word">WaltLearn</span></div>
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+<div class="cursor-trail" id="cursorTrail1" aria-hidden="true"></div>
+<div class="cursor-trail" id="cursorTrail2" aria-hidden="true"></div>
+<div class="cursor-trail" id="cursorTrail3" aria-hidden="true"></div>
+<div class="cursor-label" id="cursorLabel" aria-hidden="true"></div>
+<div class="aurora" aria-hidden="true">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="grid-glow"></div>
+</div>
+
+<header class="topbar">
+  <button class="brand" data-nav="home" aria-label="WaltLearn home">
+    <span class="brand-mark">W</span>
+    <span class="brand-text"><span class="brand-walt" style="color:#8f72ff">Walt</span><span class="brand-learn" style="color:#2ee6d6">Learn</span></span>
+  </button>
+  <nav class="nav" aria-label="Main">
+    <button class="nav-btn" data-nav="stats">My stats</button>
+    <button class="avatar" id="avatarBtn" data-nav="profile" aria-label="Profile">?</button>
+  </nav>
+</header>
+
+<main id="app">
+
+  <!-- MCQ TEST -->
+  <section class="screen" id="screen-mcq">
+    <div class="mcq-wrap">
+      <div class="mcq-setup" id="mcqSetup">
+        <p class="eyebrow">Custom MCQ test</p>
+        <h1>Build your own test.</h1>
+        <p class="lede">Pick a topic, choose a difficulty, and get 20 questions. Finish to earn a certificate.</p>
+        <form class="mcq-form" id="mcqForm">
+          <label class="field">
+            <span>Topic name</span>
+            <input id="mcqTopic" type="text" placeholder="e.g. Networking, Python, Space" required>
+          </label>
+          <label class="field">
+            <span>Difficulty</span>
+            <select id="mcqDifficulty">
+              <option value="easy">Easy</option>
+              <option value="medium" selected>Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </label>
+          <button class="btn btn-primary" type="submit">Start 20-question test</button>
+        </form>
+        <button class="btn btn-ghost" id="mcqBack" type="button">Back to home</button>
+      </div>
+
+      <div class="mcq-quiz" id="mcqQuiz" hidden>
+        <div class="mcq-head">
+          <p class="eyebrow" id="mcqQuizTopic"></p>
+          <span class="mcq-progress" id="mcqProgress">1 / 20</span>
+        </div>
+        <div class="mcq-bar"><div class="mcq-bar-fill" id="mcqBarFill"></div></div>
+        <h2 class="mcq-question" id="mcqQuestion"></h2>
+        <div class="mcq-options" id="mcqOptions"></div>
+        <p class="mcq-feedback" id="mcqFeedback" role="status"></p>
+      </div>
+
+      <div class="mcq-result" id="mcqResult" hidden>
+        <p class="eyebrow">Test complete</p>
+        <h1 id="mcqScore"></h1>
+        <p class="lede" id="mcqRank"></p>
+        <div class="mcq-cert" id="mcqCert">
+          <div class="cert-verified" id="certVerified">VERIFIED</div>
+          <div class="cert-inner">
+            <p class="cert-brand">WALTLEARN</p>
+            <p class="cert-subtitle">Certificate of Achievement</p>
+            <p class="cert-title">CERTIFICATE OF COMPLETION</p>
+            <div class="cert-divider"></div>
+            <p class="cert-presented">This is proudly presented to</p>
+            <p class="cert-name" id="certName"></p>
+            <p class="cert-body">for successfully completing the assessment on</p>
+            <p class="cert-topic" id="certTopic"></p>
+            <div class="cert-details">
+              <div><span>Score</span><b id="certScore"></b> / 20</div>
+              <div><span>Rank</span><b id="certRank"></b></div>
+              <div><span>Difficulty</span><b id="certDifficulty"></b></div>
+              <div><span>Date</span><b id="certDate"></b></div>
+            </div>
+            <div class="cert-divider"></div>
+            <div class="cert-footer">
+              <div class="cert-sig">
+                <p class="cert-sig-name">Davis Walter</p>
+                <p class="cert-sig-title">Creator, WaltLearn</p>
+              </div>
+              <div class="cert-seal">WALT<br>LEARN</div>
+            </div>
+          </div>
+        </div>
+        <div class="mcq-actions">
+          <button class="btn btn-primary" id="mcqPrint" type="button">Print certificate</button>
+          <button class="btn btn-ghost" id="mcqRetry" type="button">Try again</button>
+          <button class="btn btn-ghost" id="mcqHome" type="button">Back to home</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="screen" id="screen-welcome">
+    <div class="welcome">
+      <span class="w-watermark" aria-hidden="true">W</span>
+      <div class="welcome-art" aria-hidden="true">
+        <span class="w-ring r1"></span>
+        <span class="w-ring r2"></span>
+        <span class="w-ring r3"></span>
+        <span class="w-scan"></span>
+        <span class="w-dot d1"></span>
+        <span class="w-dot d2"></span>
+        <span class="w-dot d3"></span>
+        <span class="w-cross c1"></span>
+        <span class="w-cross c2"></span>
+      </div>
+      <div class="welcome-inner">
+        <p class="w-kicker"><span class="w-live"></span> A school that teaches, not summarises</p>
+        <h1 class="w-word"><span class="w-walt">Walt</span><span class="w-out">Learn</span></h1>
+        <p class="w-lede">Any topic. Any level. One honest path from “no idea” to “I can explain it.” Written lessons, live sources and a test that tells you the truth.</p>
+        <p class="w-rotating">teaches <span id="rotWord">networking</span><span class="w-caret">|</span></p>
+        <p class="w-stats"><b id="st1">0</b> topics · <b id="st2">0</b> lessons · ∞ live sources</p>
+        <div class="w-actions" id="welcomeActions">
+          <button class="btn w-google" id="googleBtn" type="button" hidden>
+            <span class="g-mark" aria-hidden="true">G</span> Continue with Google
+          </button>
+          <button class="btn w-primary" id="authSignup" type="button">Create account</button>
+          <button class="btn w-ghost" id="authLogin" type="button">Log in</button>
+        </div>
+        <p class="w-or" id="welcomeOr" hidden>or use the local phone demo</p>
+        <p class="w-note" id="welcomeNote">Free while in beta · Phone demo · Progress stays on this device</p>
+
+        <div class="welcome-side" id="welcomeSide" aria-hidden="true">
+          <div class="ws-ring"></div>
+          <div class="ws-chip" data-topic="networking">Any topic you search</div>
+          <div class="ws-chip" data-topic="python">Your level, your language</div>
+          <div class="ws-chip" data-topic="quantum">Hours you actually have</div>
+          <div class="ws-chip" data-topic="ai">A test that tells the truth</div>
+          <div class="ws-steps" id="wsSteps">
+            <span data-step="1">1. Pick a topic</span>
+            <span data-step="2">2. Set your time</span>
+            <span data-step="3">3. Get taught step by step</span>
+            <span data-step="4">4. Take the test</span>
+          </div>
+          <div class="ws-preview" id="wsPreview">
+            <div class="ws-preview-card" data-for="1">Choose from 6 built-in topics or search anything on the web. Each becomes a full course.</div>
+            <div class="ws-preview-card" data-for="2">Tell me 1, 2, 4 or 8 hours. The plan reshapes itself to fit your time.</div>
+            <div class="ws-preview-card" data-for="3">Lessons arrive one step at a time — with notes, videos, voice and a live source.</div>
+            <div class="ws-preview-card" data-for="4">A real test at the end. Marks, weak spots, and what to revisit.</div>
+          </div>
+        </div>
+
+        <div class="auth-card" id="authCard" hidden>
+          <div class="auth-head">
+            <p class="eyebrow" id="authEyebrow">Create account</p>
+            <button class="icon-btn" id="authClose" type="button" aria-label="Close">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg>
+            </button>
+          </div>
+          <p class="fineprint" id="authLocalNote" hidden>Local phone demo only. Use Google above for a real cloud account.</p>
+
+          <div class="auth-pane" id="authPhonePane">
+            <h2>What's your number?</h2>
+            <p class="fineprint">A 6-digit code will confirm it. We never post or share your number.</p>
+            <form id="phoneForm" class="auth-form">
+              <label class="field">
+                <span>Phone</span>
+                <div class="phone-row"><b>+91</b><input id="phoneInput" type="tel" inputmode="numeric" autocomplete="tel" maxlength="14" placeholder="98765 43210" required></div>
+              </label>
+              <button class="btn w-primary" type="submit">Send code on WhatsApp</button>
+            </form>
+            <p class="auth-demo" id="authDemo" role="status"></p>
+          </div>
+
+          <div class="auth-pane" id="authCodePane" hidden>
+            <h2>Enter the code</h2>
+            <p class="fineprint" id="authSentTo"></p>
+            <p class="auth-demo" id="authCodeDemo" role="status"></p>
+            <form id="codeForm" class="auth-form">
+              <label class="field">
+                <span>6-digit code</span>
+                <input id="codeInput" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" required>
+              </label>
+              <button class="btn w-primary" type="submit">Verify and continue</button>
+            </form>
+            <p class="auth-error" id="authError" role="alert"></p>
+            <div class="auth-foot">
+              <button class="link-btn" id="codeBack" type="button">Use another number</button>
+              <button class="link-btn" id="codeResend" type="button" disabled>Resend in 30s</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-ticker" aria-hidden="true">
+          <span>Networking</span><span>Python</span><span>AI &amp; ML</span><span>Quantum</span><span>Money</span><span>Speaking</span><span>anything you search</span>
+        </div>
+        <div class="w-marquee" aria-hidden="true"><div class="w-marquee-track" id="wMarqueeTrack"></div></div>
+        <div class="w-merged" id="wMerged" aria-live="polite"></div>
+      </div>
+      <p class="w-foot">WALTLEARN CREATED BY DAVIS WALTER THE GREAT</p>
+    </div>
+  </section>
+
+  <!-- HOME -->
+  <section class="screen" id="screen-home">
+    <div class="home-grid">
+      <aside class="rail side-left">
+        <div class="panel mini">
+          <div class="mini-head">
+            <p class="eyebrow">Game</p>
+            <span class="mini-score" id="gameScore">0 / 5</span>
+          </div>
+          <h3>Quick fire</h3>
+          <div id="gameBody">
+            <p class="mini-copy">Five fast questions pulled from the whole library. No timer, no pressure.</p>
+            <button class="btn btn-ghost btn-sm" id="gameStart" type="button">Play 5 questions</button>
+          </div>
+        </div>
+        <div class="panel mini">
+          <p class="eyebrow">Your streak</p>
+          <p class="mini-streak"><b id="railStreak">0</b> days in a row</p>
+          <p class="mini-copy">One finished step keeps it alive.</p>
+        </div>
+      </aside>
+
+      <div class="hero">
+        <p class="eyebrow" id="greeting">Welcome to the school</p>
+        <h1>Learn anything.<br><span class="grad">Properly.</span></h1>
+        <p class="lede">Pick a topic — written here, or pulled live from the web — tell me how many hours you have, and I will teach it one small step at a time in your language, at your level. More time buys real depth: worked examples, then deep dives, then a test at the end.</p>
+
+        <div class="w-actions" style="margin-top:12px">
+          <button class="btn btn-ghost" id="mcqNavBtn" type="button">Take a 20-question test</button>
+        </div>
+        <form class="search" id="searchForm" role="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="searchInput" type="search" placeholder="Try “networking”, “money”, “raspberry pi”…" autocomplete="off" aria-label="Search topics">
+          <button type="button" class="mic" id="micBtn" aria-label="Search by voice" title="Search by voice">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+          </button>
+          <button type="submit" class="btn btn-primary">Find</button>
+        </form>
+        <p class="search-hint" id="searchHint" aria-live="polite"></p>
+        <div class="live-results hidden" id="liveResults" aria-live="polite"></div>
+
+        <ul class="hero-meta">
+          <li>6 written topics</li>
+          <li>Live library for everything else</li>
+          <li>Saves on this device</li>
+        </ul>
+
+        <button class="continue hidden" id="continueBtn">
+          <span class="continue-dot"></span>
+          <span id="continueText"></span>
+          <span class="continue-arrow">→</span>
+        </button>
+      </div>
+
+      <aside class="rail side-right">
+        <div class="panel mini" id="factCard">
+          <div class="mini-head">
+            <p class="eyebrow">Did you know</p>
+            <button class="icon-btn mini-btn" id="factShuffle" type="button" aria-label="Another fact">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg>
+            </button>
+          </div>
+          <p class="fact-text" id="factText">Every topic hides one thing that surprises people. Shuffle to find it.</p>
+          <p class="fact-source" id="factSource"></p>
+          <div class="fact-actions">
+            <button class="link-btn" id="factSpeak" type="button">Hear it</button>
+            <button class="link-btn" id="factShake" type="button">New fact</button>
+            <button class="link-btn hidden" id="enableShake" type="button">Enable shake</button>
+          </div>
+          <p class="fact-hint">Shake your phone, or tap New fact.</p>
+        </div>
+
+        <div class="panel mini">
+          <p class="eyebrow">Try a live search</p>
+          <div class="mini-chips">
+            <button class="chip" type="button" data-try="Raspberry Pi">Raspberry Pi</button>
+            <button class="chip" type="button" data-try="Lil Peep">Lil Peep</button>
+            <button class="chip" type="button" data-try="Black hole">Black hole</button>
+          </div>
+          <p class="mini-copy">Anything outside the written library is pulled from Wikipedia, with its photo.</p>
+        </div>
+      </aside>
+    </div>
+
+    <div class="graph panel">
+      <div class="graph-head">
+        <div>
+          <p class="eyebrow">The knowledge map</p>
+          <h2>Topics that connect</h2>
+        </div>
+        <span class="live" id="graphTag"><span></span>starter library</span>
+      </div>
+      <div class="graph-stage" id="graphStage">
+        <svg class="edges" id="graphEdges" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="graph-nodes" id="graphNodes"></div>
+      </div>
+      <p class="graph-hint">Tap any topic to open its path</p>
+    </div>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>All topics</h2>
+        <span class="count" id="topicCount"></span>
+      </div>
+      <div class="topic-grid" id="topicGrid"></div>
+    </section>
+
+    <section class="section hidden" id="liveSection">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Found by you</p>
+          <h2>Your live library</h2>
+        </div>
+        <span class="count" id="liveCount"></span>
+      </div>
+      <div class="topic-grid" id="liveGrid"></div>
+      <p class="fineprint">Summaries generated from Wikipedia, saved on this device. <a href="https://www.wikipedia.org" target="_blank" rel="noopener">Wikipedia</a> · CC BY-SA.</p>
+    </section>
+
+    <section class="section how">
+      <h2>How a lesson actually goes</h2>
+      <ol class="steps">
+        <li><span>01</span><b>Set the time</b><p>1 hour or 8, the path is built to fit the time you really have.</p></li>
+        <li><span>02</span><b>Get taught</b><p>Small steps, simple words, one idea at a time. Notes and a video when you need them.</p></li>
+        <li><span>03</span><b>Prove it</b><p>A short test at the end. Marks go to your stats so you can see what stuck.</p></li>
+      </ol>
+    </section>
+
+    <footer class="foot">
+      <p>WaltLearn · written lessons plus live Wikipedia summaries.</p>
+      <p class="muted">Progress is saved on this device only. Live content © Wikipedia contributors, CC BY-SA 4.0.</p>
+    </footer>
+  </section>
+
+  <!-- ONBOARDING -->
+  <section class="screen" id="screen-onboard">
+    <div class="center-wrap">
+      <div class="onboard panel">
+        <div class="brand-mark big">W</div>
+        <p class="eyebrow">First day at school</p>
+        <h1>Who is learning?</h1>
+        <p class="lede small">This is only used to teach in a way that fits you. Nothing leaves this device.</p>
+
+        <form id="onboardForm" class="form">
+          <label class="field">
+            <span>Your name</span>
+            <input id="onName" maxlength="30" placeholder="e.g. David" required>
+          </label>
+
+          <div class="field-row">
+            <label class="field">
+              <span>Age</span>
+              <input id="onAge" type="number" min="8" max="99" placeholder="21" required>
+            </label>
+            <label class="field">
+              <span>Right now you are</span>
+              <select id="onStatus">
+                <option>Student</option>
+                <option>Working</option>
+                <option>Self-learning</option>
+                <option>Switching careers</option>
+                <option>Just curious</option>
+              </select>
+            </label>
+          </div>
+
+          <fieldset class="field">
+            <legend>Teach me in</legend>
+            <div class="chips" id="langChips">
+              <button type="button" class="chip" data-lang="en">English</button>
+              <button type="button" class="chip" data-lang="hi">Hinglish</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="field">
+            <legend>Explain it like</legend>
+            <div class="chips" id="levelChips">
+              <button type="button" class="chip" data-level="simple">I'm brand new</button>
+              <button type="button" class="chip" data-level="standard">I know a little</button>
+              <button type="button" class="chip" data-level="deep">Give me depth</button>
+            </div>
+          </fieldset>
+
+          <button class="btn btn-primary btn-lg" type="submit">Enter the school →</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="screen" id="screen-plan">
+    <button class="back" data-nav="home">← All topics</button>
+    <div class="plan-head">
+      <div class="topic-badge" id="planIcon"></div>
+      <div>
+        <p class="eyebrow">Learning path</p>
+        <h1 id="planTitle">Networking</h1>
+        <p class="lede small" id="planBlurb"></p>
+        <p class="plan-source" id="planSource" hidden></p>
+      </div>
+    </div>
+
+    <div class="plan-grid">
+      <div class="plan-main">
+        <div class="panel plan-controls">
+          <p class="label">How much time do you have today?</p>
+          <div class="chips" id="hourChips"></div>
+          <div class="plan-meta" id="planMeta"></div>
+          <button class="btn btn-primary btn-lg" id="buildPlanBtn">Build my path</button>
+        </div>
+
+        <div id="planPreview" class="hidden">
+          <div class="plan-summary panel">
+            <div>
+              <p class="eyebrow">Your path</p>
+              <h2 id="planSummaryTitle"></h2>
+            </div>
+            <div class="plan-numbers">
+              <div><b id="planItems">0</b><span>steps</span></div>
+              <div><b id="planMinutes">0</b><span>minutes</span></div>
+              <div><b id="planLessons">0</b><span>lessons</span></div>
+            </div>
+          </div>
+          <ol class="plan-list" id="planList"></ol>
+          <button class="btn btn-primary btn-lg wide" id="startPlanBtn">Start learning →</button>
+        </div>
+      </div>
+
+      <aside class="studio">
+        <button class="studio-visual" id="studioVisual" type="button" aria-label="Open the topic visual">
+          <span class="studio-poster" id="studioPoster"></span>
+          <img id="studioImg" alt="" hidden>
+          <span class="studio-open">Tap to explore</span>
+        </button>
+
+        <div class="panel mini">
+          <p class="eyebrow">Did you know</p>
+          <p class="fact-text" id="studioFact"></p>
+          <button class="link-btn" id="studioSpeak" type="button">Hear it</button>
+        </div>
+
+        <div class="panel mini">
+          <p class="eyebrow">Soundtrack</p>
+          <a class="studio-link" id="studioMusic" href="#" target="_blank" rel="noopener">Music for this topic ↗</a>
+          <a class="studio-link" id="studioVideo" href="#" target="_blank" rel="noopener">Watch an explainer ↗</a>
+        </div>
+
+        <div class="panel mini">
+          <p class="eyebrow">Go deeper</p>
+          <div class="deep-links" id="studioLinks"></div>
+          <p class="mini-copy">Search the same topic on the platforms you already use.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- LEARN -->
+  <section class="screen" id="screen-learn">
+    <div class="learn-top">
+      <button class="icon-btn" data-nav="home" aria-label="Leave lesson"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></button>
+      <button class="icon-btn voice-btn" id="voiceBtn" type="button" aria-pressed="false" aria-label="Read lessons aloud" title="Read lessons aloud">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3l5 4v-13l-5 4H4zM16 9a4.5 4.5 0 0 1 0 6M18.6 6.4a8.5 8.5 0 0 1 0 11.2"/></svg>
+      </button>
+      <div class="progress" role="progressbar" aria-label="Lesson progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="learnProgress"><div class="progress-fill" id="learnBar"></div></div>
+      <span class="learn-time" id="learnTime">0 min</span>
+    </div>
+    <div class="learn-wrap">
+      <div class="chat" id="chat" aria-live="polite"></div>
+      <div class="chat-actions" id="chatActions"></div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="screen" id="screen-quiz">
+    <div class="quiz-wrap panel">
+      <div class="quiz-top">
+        <p class="eyebrow" id="quizProgress">Question 1</p>
+        <div class="quiz-top-right">
+          <span class="quiz-score" id="quizRunning">0 correct</span>
+          <button class="icon-btn" id="quizClose" aria-label="Leave the test"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></button>
+        </div>
+      </div>
+      <h2 id="quizQuestion"></h2>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-why" id="quizWhy" hidden></div>
+      <button class="btn btn-primary" id="quizNext" disabled>Next →</button>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="screen-result">
+    <div class="result-wrap">
+      <div class="score-ring" id="scoreRing">
+        <span id="scoreNum">0%</span>
+        <small>score</small>
+      </div>
+      <h1 id="resultTitle"></h1>
+      <p class="lede small" id="resultMsg"></p>
+      <div class="review panel" id="resultReview"></div>
+      <div class="row">
+        <button class="btn btn-ghost" data-nav="home">Back to school</button>
+        <button class="btn btn-primary" id="retryBtn">Try the test again</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="screen" id="screen-stats">
+    <button class="back" data-nav="home">← Home</button>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Your progress</p>
+        <h1>Stats</h1>
+      </div>
+      <span class="count" id="statsName"></span>
+    </div>
+    <div class="stat-grid" id="statGrid"></div>
+    <div class="panel">
+      <h2>By topic</h2>
+      <div id="topicStats" class="topic-stats"></div>
+    </div>
+    <div class="panel">
+      <h2>Recent tests</h2>
+      <div id="recentTests" class="recent"></div>
+    </div>
+  </section>
+
+  <!-- PROFILE -->
+  <section class="screen" id="screen-profile">
+    <button class="back" data-nav="home">← Home</button>
+    <div class="profile-wrap">
+      <div class="panel profile-card">
+        <div class="avatar big" id="profileAvatar">?</div>
+        <h1 id="profileName">Your profile</h1>
+        <p class="muted" id="profileSub"></p>
+      </div>
+
+      <form class="panel form" id="profileForm">
+        <h2>Learning settings</h2>
+        <label class="field">
+          <span>Name</span>
+          <input id="pfName" maxlength="30" required>
+        </label>
+        <div class="field-row">
+          <label class="field">
+            <span>Age</span>
+            <input id="pfAge" type="number" min="8" max="99" required>
+          </label>
+          <label class="field">
+            <span>Right now you are</span>
+            <select id="pfStatus">
+              <option>Student</option>
+              <option>Working</option>
+              <option>Self-learning</option>
+              <option>Switching careers</option>
+              <option>Just curious</option>
+            </select>
+          </label>
+        </div>
+        <fieldset class="field">
+          <legend>Teach me in</legend>
+          <div class="chips" id="pfLangChips">
+            <button type="button" class="chip" data-lang="en">English</button>
+            <button type="button" class="chip" data-lang="hi">Hinglish</button>
+          </div>
+        </fieldset>
+        <fieldset class="field">
+          <legend>Explain it like</legend>
+          <div class="chips" id="pfLevelChips">
+            <button type="button" class="chip" data-level="simple">I'm brand new</button>
+            <button type="button" class="chip" data-level="standard">I know a little</button>
+            <button type="button" class="chip" data-level="deep">Give me depth</button>
+          </div>
+        </fieldset>
+        <button class="btn btn-primary" type="submit">Save changes</button>
+      </form>
+
+      <div class="panel">
+        <h2>Account</h2>
+        <p class="muted" id="accountLine"></p>
+        <button class="btn btn-ghost" id="logoutBtn" type="button">Log out</button>
+      </div>
+
+      <div class="panel pro-card">
+        <p class="eyebrow">WaltLearn Pro</p>
+        <h2>Go further, sooner</h2>
+        <p class="muted">Unlimited live depth, printable certificates, and priority topic requests. Free while in beta.</p>
+        <button class="btn btn-ghost" id="proWaitlist" type="button">Join early access</button>
+      </div>
+
+      <div class="panel danger">
+        <h2>Start over</h2>
+        <p class="muted">Deletes your profile, lessons done, tests and scores from this device. Cannot be undone.</p>
+        <button class="btn btn-danger" id="resetBtn">Reset everything</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="viewer" id="viewer" hidden>
+    <div class="viewer-top">
+      <div>
+        <p class="eyebrow" id="viewerEyebrow">Topic visual</p>
+        <h3 id="viewerLabel">Raspberry Pi</h3>
+      </div>
+      <button class="icon-btn" id="viewerClose" type="button" aria-label="Close the visual">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg>
+      </button>
+    </div>
+    <div class="viewer-stage" id="viewerStage">
+      <div class="viewer-card" id="viewerCard">
+        <img id="viewerImg" alt="" hidden>
+        <span class="studio-poster" id="viewerPoster"></span>
+      </div>
+    </div>
+    <p class="viewer-hint">Drag to turn · scroll to zoom · double-click to reset</p>
+  </div>
+</main>
+
+<dialog class="topic-dialog" id="topicDialog" aria-labelledby="dlgTitle">
+  <div class="dialog-head">
+    <div class="topic-badge" id="dlgIcon"></div>
+    <button class="icon-btn" id="dlgClose" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></button>
+  </div>
+  <p class="eyebrow">Topic</p>
+  <h2 id="dlgTitle"></h2>
+  <p class="lede small" id="dlgBlurb"></p>
+  <div class="dlg-meta" id="dlgMeta"></div>
+  <div class="dlg-lessons" id="dlgLessons"></div>
+  <div class="row">
+    <a class="btn btn-ghost" id="dlgVideo" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+    <button class="btn btn-primary" id="dlgStart">Choose time →</button>
+  </div>
+</dialog>
+
+<div class="wipe" id="wipe" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="supabase-config.js?v=57"></script>
+<script src="data.js?v=57"></script>
+<script src="app.js?v=57"></script>
+</body>
+</html>
